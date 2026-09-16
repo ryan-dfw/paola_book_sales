@@ -1,0 +1,10 @@
+:root {
+  --ink: #f2efe9;
+  --ink-soft: #a8a6a3;
+  --cream: #101012;
+  --cream-deep: #1c1c1f;
+  --accent: #e0333f;
+  --accent-deep: #b3121c;
+  --line: #2b2b2e;
+  color-scheme: dark;
+}

@@ -1,0 +1,47 @@
+.site-header {
+  padding: 28px 24px 0;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.wordmark {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-size: 1.05rem;
+  color: var(--accent);
+}
+
+.layout {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+  display: grid;
+  grid-template-columns: minmax(240px, 380px) 1fr;
+  gap: clamp(32px, 6vw, 80px);
+  align-items: start;
+}
+
+@media (max-width: 780px) {
+  .layout {
+    grid-template-columns: 1fr;
+    padding-top: 24px;
+  }
+}
+
+.cover-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.details {
+  padding-top: 4px;
+}
+
+.site-footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  border-top: 1px solid var(--line);
+}

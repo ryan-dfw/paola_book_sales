@@ -1,0 +1,63 @@
+.cover {
+  width: 100%;
+  max-width: 340px;
+  aspect-ratio: 2 / 3;
+  border-radius: 6px;
+  background:
+    radial-gradient(120% 90% at 15% 0%, rgba(255, 255, 255, 0.07), transparent 60%),
+    linear-gradient(160deg, #232323 0%, #0e0e0e 55%, #000000 100%);
+  box-shadow:
+    0 30px 60px -20px rgba(0, 0, 0, 0.7),
+    0 0 50px rgba(224, 51, 63, 0.14);
+  transform: rotate(-1.5deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 12% 10%;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #000000;
+}
+
+.cover::after {
+  content: '';
+  position: absolute;
+  inset: 14px;
+  border: 1px solid rgba(224, 51, 63, 0.45);
+  pointer-events: none;
+}
+
+.cover-eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+  color: var(--accent);
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.cover-rule {
+  width: 46px;
+  height: 2px;
+  background: var(--accent);
+  margin-bottom: 18px;
+}
+
+.cover-title {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-weight: normal;
+  letter-spacing: 0.01em;
+  font-size: clamp(1.6rem, 4.4vw, 2.2rem);
+  line-height: 1.1;
+  color: #ffffff;
+}
+
+.cover-author {
+  margin-top: 22px;
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--accent);
+}

@@ -1,0 +1,22 @@
+# Secrets — never commit real keys
+*.env
+
+# Dependencies (Netlify runs npm install itself)
+node_modules
+
+# Build output (Netlify builds it fresh)
+dist
+
+# Editor / OS cruft
+.idea
+.vscode
+.DS_Store
+
+# Local Netlify folder
+.netlify
+
+# Stray Deno lockfile Netlify CLI sometimes generates locally — not needed in the repo
+deno.lock
+
+# Notes
+*.md

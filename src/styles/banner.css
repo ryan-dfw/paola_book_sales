@@ -1,0 +1,21 @@
+.banner {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 14px 24px;
+  text-align: center;
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.banner.success {
+  background: #113420;
+  color: #7fdba0;
+  border-bottom: 1px solid #1e5c37;
+}
+
+.banner.cancel {
+  background: #201f1f;
+  color: #cfcac6;
+  border-bottom: 1px solid #3a3838;
+}
