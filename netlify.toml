@@ -3,6 +3,15 @@
   publish = "dist"
   functions = "netlify/functions"
 
+[build.environment]
+  # These three env vars trip Netlify's secrets scanner, but none of them
+  # belong in it: VENMO_HANDLE/ZELLE_CONTACT are meant to be shown to the
+  # customer (manual-order.js returns them straight in the API response),
+  # and STRIPE_WEBHOOK_SECRET only ever runs server-side inside
+  # stripe-webhook.js to verify a signature — it's never in any built
+  # output. See https://docs.netlify.com/environment-variables/secrets-controller/
+  SECRETS_SCAN_OMIT_KEYS = "STRIPE_WEBHOOK_SECRET,VENMO_HANDLE,ZELLE_CONTACT"
+
 [dev]
   command = "npm run dev"
   targetPort = 5173
