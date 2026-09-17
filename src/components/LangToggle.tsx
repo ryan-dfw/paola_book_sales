@@ -1,27 +1,27 @@
-import type { Locale } from '../types';
+import type { UiLocale } from '../content/types';
 
 interface LangToggleProps {
-  locale: Locale;
-  onChange: (locale: Locale) => void;
+  lang: UiLocale;
+  onChange: (lang: UiLocale) => void;
 }
 
-export function LangToggle({ locale, onChange }: LangToggleProps) {
+export function LangToggle({ lang, onChange }: LangToggleProps) {
   return (
-    <div className="lang-toggle" role="tablist" aria-label="Edition language">
+    <div className="toggle-group" role="tablist" aria-label="Language">
       <button
         type="button"
-        className={`lang-btn${locale === 'en' ? ' is-active' : ''}`}
+        className={`toggle-btn${lang === 'en' ? ' is-active' : ''}`}
         role="tab"
-        aria-selected={locale === 'en'}
+        aria-selected={lang === 'en'}
         onClick={() => onChange('en')}
       >
         English
       </button>
       <button
         type="button"
-        className={`lang-btn${locale === 'es' ? ' is-active' : ''}`}
+        className={`toggle-btn${lang === 'es' ? ' is-active' : ''}`}
         role="tab"
-        aria-selected={locale === 'es'}
+        aria-selected={lang === 'es'}
         onClick={() => onChange('es')}
       >
         Español

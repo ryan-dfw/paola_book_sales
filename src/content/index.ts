@@ -1,8 +1,7 @@
-import type { Locale } from '../types';
-import type { LocaleContent } from './types';
 import { en } from './en';
 import { es } from './es';
+import type { LocaleContent, UiLocale } from './types';
 
-export const CONTENT: Record<Locale, LocaleContent> = { en, es };
+export const CONTENT: Record<UiLocale, LocaleContent> = { en, es };
 
-export type { LocaleContent, ManualMethodLabels } from './types';
+export type { LocaleContent, ManualMethodLabels, UiLocale } from './types';

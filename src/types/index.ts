@@ -1,20 +1,31 @@
 // Model layer: the shapes shared across the app. Nothing in here touches the
 // DOM or makes a network call — that's what src/api and src/hooks are for.
 
-export type Locale = 'en' | 'es';
 export type ManualPaymentMethod = 'venmo' | 'zelle';
 export type BannerKind = 'success' | 'cancel';
 
-/** A single Stripe price, as returned by /api/get-prices. One per language — signed no longer changes the price. */
-export interface PriceEntry {
+/**
+ * A sellable book product, read live from Stripe (Product + its default
+ * Price). Name, blurb, cover image, and amount are Stripe data — nothing
+ * here is hardcoded per-product on the frontend or in the functions.
+ *
+ * `lang`/`format` come from optional Stripe Product metadata (set in the
+ * Dashboard: metadata.lang = "en"/"es", metadata.format = "softcover"/
+ * "hardcover", etc.) — either can be null if a product isn't tagged.
+ */
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  image: string | null;
+  lang: string | null;
+  format: string | null;
   amount: number; // integer cents
   currency: string;
 }
 
-export type PricesResponse = Record<Locale, PriceEntry | null>;
-
 export interface ManualOrderPayload {
-  format: Locale;
+  productId: string;
   signed: boolean;
   method: ManualPaymentMethod;
 }
@@ -29,7 +40,7 @@ export interface ManualOrderResult {
 }
 
 export interface CheckoutRequest {
-  format: Locale;
+  productId: string;
   signed: boolean;
 }
 

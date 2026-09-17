@@ -1,15 +1,50 @@
-.cover {
+/*
+ * Every cover — the real Stripe product image or the CSS-mockup fallback —
+ * renders inside .cover-frame, which owns the size/rotation/shadow and adds
+ * a strip of "page edges" peeking out the right side. That's what keeps a
+ * dark-on-dark cover image from reading as a flat rectangle against this
+ * site's dark background: even without that visual trick, it also gives
+ * every cover (regardless of how Stripe's source image was cropped) the
+ * same fixed size and 2:3 aspect ratio, via .cover/.cover-image below.
+ */
+.cover-frame {
+  position: relative;
   width: 100%;
   max-width: 340px;
+  transform: rotate(-1.5deg);
+}
+
+.cover-frame::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  right: -5px;
+  width: 8px;
+  background: repeating-linear-gradient(to bottom, #ece7da 0px, #ece7da 1px, #d2ccbc 1px, #d2ccbc 2px);
+  border-radius: 0 3px 3px 0;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.45);
+  z-index: 0;
+}
+
+.cover,
+.cover-image {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
   aspect-ratio: 2 / 3;
-  border-radius: 6px;
+  border-radius: 2px 6px 6px 2px;
+}
+
+.cover {
   background:
     radial-gradient(120% 90% at 15% 0%, rgba(255, 255, 255, 0.07), transparent 60%),
     linear-gradient(160deg, #232323 0%, #0e0e0e 55%, #000000 100%);
   box-shadow:
     0 30px 60px -20px rgba(0, 0, 0, 0.7),
-    0 0 50px rgba(224, 51, 63, 0.14);
-  transform: rotate(-1.5deg);
+    0 0 50px rgba(224, 51, 63, 0.14),
+    0 0 0 1px rgba(242, 239, 233, 0.07);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -17,12 +52,11 @@
   text-align: center;
   padding: 12% 10%;
   color: #ffffff;
-  position: relative;
   overflow: hidden;
   border: 1px solid #000000;
 }
 
-.cover::after {
+.cover::before {
   content: '';
   position: absolute;
   inset: 14px;
@@ -60,4 +94,13 @@
   font-style: italic;
   font-size: 0.95rem;
   color: var(--accent);
+}
+
+.cover-image {
+  object-fit: cover;
+  object-position: center;
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  box-shadow:
+    0 30px 60px -20px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(242, 239, 233, 0.12);
 }

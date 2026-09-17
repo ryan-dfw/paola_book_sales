@@ -3,12 +3,9 @@ import type { LocaleContent } from './types';
 export const es: LocaleContent = {
   title: 'El Narcisista Amor de Mi Vida',
   byline: 'por Paola Roman',
-  blurb:
-    'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum ' +
-    'dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non ' +
-    'proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+  formatLabels: { softcover: 'Tapa blanda', hardcover: 'Tapa dura' },
   signedLabel: 'Firmar mi copia',
-  buyPrefix: 'Comprar el libro',
+  buyPrefix: 'Pagar',
   altToggle: '¿Prefieres Venmo o Zelle?',
   altToggleClose: 'No, gracias',
   manualIntro: '¿Prefieres pagar con Venmo o Zelle? Elige uno:',

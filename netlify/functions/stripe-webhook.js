@@ -41,7 +41,7 @@ exports.handler = async (event) => {
       email: session.customer_details?.email,
       amountTotal: session.amount_total,
       currency: session.currency,
-      format: session.metadata?.format,
+      productId: session.metadata?.productId,
       signed: session.metadata?.signed === 'yes',
       inscriptionName: inscriptionField?.text?.value || null,
     };
@@ -52,6 +52,8 @@ exports.handler = async (event) => {
     // e.g. email the author (Resend/SendGrid), write to Airtable/a database,
     // or post to Slack. This is the one place order fulfillment starts — and
     // where you'd flag "signed" orders for the author to actually sign.
+    // `order.productId` is the Stripe Product id — look it up (or expand it
+    // on the session) if you need the product name/format in the message.
     //
     // Shipping is intentionally not collected yet (this build is for
     // in-person handoff at an event). Once remote/shipped orders are

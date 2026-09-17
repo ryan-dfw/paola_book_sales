@@ -16,16 +16,18 @@ h1 {
   font-size: 1.05rem;
 }
 
-.lang-toggle {
+/* Shared pill-toggle style used by both LangToggle and FormatToggle. */
+.toggle-group {
   display: inline-flex;
+  flex-wrap: wrap;
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 3px;
-  margin-bottom: 22px;
+  margin: 0 8px 12px 0;
   background: var(--cream-deep);
 }
 
-.lang-btn {
+.toggle-btn {
   border: none;
   background: transparent;
   padding: 7px 18px;
@@ -38,7 +40,7 @@ h1 {
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.lang-btn.is-active {
+.toggle-btn.is-active {
   background: var(--accent);
   color: #ffffff;
 }
@@ -47,7 +49,7 @@ h1 {
   color: var(--ink-soft);
   font-size: 1.02rem;
   max-width: 46ch;
-  margin: 0 0 24px;
+  margin: 10px 0 24px;
 }
 
 .signed-toggle {
