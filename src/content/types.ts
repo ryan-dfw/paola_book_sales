@@ -8,22 +8,26 @@ import type { ManualPaymentMethod } from '../types';
  */
 export type UiLocale = 'en' | 'es';
 
+/**
+ * The one flat three-way choice a buyer makes, standing in for what used to
+ * be two separate toggles (language, then conditionally format). There are
+ * only three real products today — English Hardcover, English Softcover,
+ * and Spanish — so this maps directly onto them instead of onto an
+ * independent (lang, format) pair. 'english' means the English softcover
+ * edition (the default); Spanish only comes in one format today, so there's
+ * no separate "Spanish hardcover" option.
+ */
+export type Edition = 'hardcover' | 'english' | 'espanol';
+
 export interface ManualMethodLabels {
   venmo: string;
   zelle: string;
-}
-
-/** Labels for the book formats a language can come in. Only 'softcover' and 'hardcover' exist today (English has both, Spanish only softcover), keyed to match each product's Stripe metadata.format value. */
-export interface FormatLabels {
-  softcover: string;
-  hardcover: string;
 }
 
 /** Pure UI/site chrome text — not Stripe data. Blurb, price, and cover image are still read live from the selected Stripe product; title/byline are fixed per language since Stripe product names aren't customer-facing copy. */
 export interface LocaleContent {
   title: string;
   byline: string;
-  formatLabels: FormatLabels;
   signedLabel: string;
   buyPrefix: string;
   altToggle: string;

@@ -3,7 +3,6 @@ import type { LocaleContent } from './types';
 export const en: LocaleContent = {
   title: 'The Narcissist Love of My Life',
   byline: 'by Paola Roman',
-  formatLabels: { softcover: 'Softcover', hardcover: 'Hardcover' },
   signedLabel: 'Sign my copy',
   buyPrefix: 'Checkout',
   altToggle: 'Prefer Venmo or Zelle?',
