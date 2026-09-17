@@ -97,3 +97,77 @@
   object-position: center;
   border: 1px solid rgba(0, 0, 0, 0.6);
 }
+
+/*
+ * 3D book stage (src/components/Book3D.tsx). The canvas is a little wider
+ * than its grid column and taller than the old flat cover, so a tumbling
+ * book has room to swing its corners without clipping. The flat cover sits
+ * underneath, centred at roughly the same size, until the first 3D frame
+ * is drawn — then it fades out.
+ */
+.book3d-stage {
+  position: relative;
+  width: calc(100% + 48px);
+  margin: -24px -24px 0;
+  aspect-ratio: 4 / 5;
+  max-height: 78vh;
+}
+
+.book3d-stage::before {
+  /* soft brand glow behind the book */
+  content: '';
+  position: absolute;
+  inset: 12% 14%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(224, 51, 63, 0.16), rgba(224, 51, 63, 0) 70%);
+  pointer-events: none;
+}
+
+.book3d-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  /* Every touch on the book turns it — the page still scrolls from anywhere else. */
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+.book3d-canvas.is-grabbing {
+  cursor: grabbing;
+}
+
+.book3d-stage.is-ready .book3d-canvas {
+  opacity: 1;
+}
+
+.book3d-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: opacity 400ms ease;
+}
+
+.book3d-fallback .cover-frame {
+  width: auto;
+  height: 62%;
+}
+
+.book3d-stage.is-ready .book3d-fallback {
+  opacity: 0;
+}
+
+@media (max-width: 780px) {
+  .book3d-stage {
+    width: 100%;
+    margin: -12px 0 0;
+    max-height: 62vh;
+  }
+}

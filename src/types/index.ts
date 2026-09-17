@@ -20,6 +20,8 @@ export interface Product {
   image: string | null;
   lang: string | null;
   format: string | null;
+  /** Stripe's package weight (ounces), if set on the product — used by the 3D book's physics. */
+  weightOz: number | null;
   amount: number; // integer cents
   currency: string;
 }

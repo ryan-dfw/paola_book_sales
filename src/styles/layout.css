@@ -17,7 +17,7 @@
   margin: 0 auto;
   padding: 48px 24px 80px;
   display: grid;
-  grid-template-columns: minmax(240px, 380px) 1fr;
+  grid-template-columns: minmax(260px, 400px) 1fr;
   gap: clamp(32px, 6vw, 80px);
   align-items: start;
 }
