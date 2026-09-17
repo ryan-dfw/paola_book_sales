@@ -68,7 +68,13 @@ export function App() {
       <Header />
 
       <main className="layout">
-        <BookCover title={content.title} image={product?.image ?? null} />
+        <BookCover
+          title={content.title}
+          image={product?.image ?? null}
+          lang={product?.lang ?? lang}
+          format={product?.format ?? targetFormat ?? 'softcover'}
+          weightOz={product?.weightOz ?? null}
+        />
 
         <section className="details">
           <h1>{content.title}</h1>
@@ -85,6 +91,10 @@ export function App() {
             disabled={buyDisabled}
             onClick={() => product && startCheckout(product.id, signed)}
           />
+          {/* TEMP DEBUG LABEL — delete this <p> and the ".debug-label" rule
+              in src/styles/product.css to remove. Plain text, not a design
+              element — doesn't touch the button or block clicks. */}
+          <p className="debug-label" aria-hidden="true">DEBUG: CHECKOUT NOT TESTED — DO NOT USE</p>
 
           <div className="alt-payment">
             <AltPaymentToggle

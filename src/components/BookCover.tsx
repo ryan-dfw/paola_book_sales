@@ -1,6 +1,18 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
+
+const Book3D = lazy(() => import('./Book3D'));
 
 interface BookCoverProps {
+  title: string;
+  image: string | null;
+  /** From the Stripe product's metadata (falls back to the edition picker). */
+  lang: string | null;
+  format: string | null;
+  /** Stripe package weight, if set — makes a heavier book coast longer. */
+  weightOz: number | null;
+}
+
+interface FlatCoverProps {
   title: string;
   image: string | null;
 }
@@ -10,7 +22,7 @@ interface BookCoverProps {
 // the docstring below for the reasoning.
 const FADE_MS = 260;
 
-function CoverArt({ title, image }: BookCoverProps) {
+function CoverArt({ title, image }: FlatCoverProps) {
   return image ? (
     <img className="cover-image" src={image} alt={title ? `Cover of ${title}` : 'Book cover'} />
   ) : (
@@ -23,6 +35,9 @@ function CoverArt({ title, image }: BookCoverProps) {
 }
 
 /**
+ * The flat cover: shown while the 3D book is still loading, and as the
+ * permanent fallback where WebGL isn't available.
+ *
  * Shows the selected product's Stripe image when it has one, inside a
  * "book" frame (rotation, drop shadow, and a stripe of page-edges peeking
  * out the side) so it reads as a physical book even when the art itself is
@@ -41,7 +56,7 @@ function CoverArt({ title, image }: BookCoverProps) {
  * top of each other, producing a flash/pop mid-transition, which is its
  * own kind of distracting.
  */
-export function BookCover({ title, image }: BookCoverProps) {
+function FlatCover({ title, image }: FlatCoverProps) {
   const [current, setCurrent] = useState(image);
   const [incoming, setIncoming] = useState<{ image: string | null; entered: boolean } | null>(null);
 
@@ -71,16 +86,64 @@ export function BookCover({ title, image }: BookCoverProps) {
   }, [image, current]);
 
   return (
-    <section className="cover-wrap">
-      <div className="cover-frame">
-        <div className="cover-layer">
-          <CoverArt title={title} image={current} />
+    <div className="cover-frame">
+      <div className="cover-layer">
+        <CoverArt title={title} image={current} />
+      </div>
+      {incoming && (
+        <div className={`cover-layer cover-layer-incoming${incoming.entered ? ' is-in' : ''}`}>
+          <CoverArt title={title} image={incoming.image} />
         </div>
-        {incoming && (
-          <div className={`cover-layer cover-layer-incoming${incoming.entered ? ' is-in' : ''}`}>
-            <CoverArt title={title} image={incoming.image} />
-          </div>
-        )}
+      )}
+    </div>
+  );
+}
+
+function hasWebGL(): boolean {
+  try {
+    const c = document.createElement('canvas');
+    return !!c.getContext('webgl2');
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The book on the product page: a real 3D model you can turn, fling, and
+ * watch tumble (see src/book3d), with the flat cover standing in until the
+ * model's first frame is drawn — or for good, if WebGL isn't available.
+ */
+export function BookCover({ title, image, lang, format, weightOz }: BookCoverProps) {
+  const [supported] = useState(hasWebGL);
+  const [failed, setFailed] = useState(false);
+  const [ready, setReady] = useState(false);
+  const use3D = supported && !failed;
+
+  if (!use3D) {
+    return (
+      <section className="cover-wrap">
+        <FlatCover title={title} image={image} />
+      </section>
+    );
+  }
+
+  return (
+    <section className="cover-wrap">
+      <div className={`book3d-stage${ready ? ' is-ready' : ''}`}>
+        <div className="book3d-fallback" aria-hidden={ready}>
+          <FlatCover title={title} image={image} />
+        </div>
+        <Suspense fallback={null}>
+          <Book3D
+            title={title}
+            lang={lang}
+            format={format}
+            weightOz={weightOz}
+            frontImage={image}
+            onReady={() => setReady(true)}
+            onFail={() => setFailed(true)}
+          />
+        </Suspense>
       </div>
     </section>
   );

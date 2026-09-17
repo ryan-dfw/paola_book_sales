@@ -49,6 +49,9 @@ async function listActiveProducts(stripe) {
         image: product.images?.[0] || null,
         lang: product.metadata?.lang || null,
         format: product.metadata?.format || null,
+        // Product > Shipping > Package dimensions in the Dashboard. Only the
+        // weight is used (the 3D book's mass); null when not filled in.
+        weightOz: product.package_dimensions?.weight || null,
         priceId: price.id,
         amount: price.unit_amount,
         currency: price.currency,
