@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { Locale, ManualOrderResult, ManualPaymentMethod } from '../types';
+import type { ManualOrderResult, ManualPaymentMethod } from '../types';
 import { submitManualOrder } from '../api/manualOrder';
 
 /**
@@ -7,9 +7,9 @@ import { submitManualOrder } from '../api/manualOrder';
  * author are standing next to each other, so this just needs to surface
  * which handle to pay and a short reference code — nothing else.
  * Automatically re-fetches whenever the panel is open and the method,
- * language, or signed-copy choice changes.
+ * product, or signed-copy choice changes.
  */
-export function useManualPayment(locale: Locale, signed: boolean) {
+export function useManualPayment(productId: string | null, signed: boolean) {
   const [isOpen, setIsOpen] = useState(false);
   const [method, setMethod] = useState<ManualPaymentMethod>('venmo');
   const [loading, setLoading] = useState(false);
@@ -19,13 +19,13 @@ export function useManualPayment(locale: Locale, signed: boolean) {
   const toggle = useCallback(() => setIsOpen((open) => !open), []);
 
   useEffect(() => {
-    if (!isOpen) return undefined;
+    if (!isOpen || !productId) return undefined;
 
     let cancelled = false;
     setLoading(true);
     setError(null);
 
-    submitManualOrder({ format: locale, signed, method })
+    submitManualOrder({ productId, signed, method })
       .then((orderResult) => {
         if (!cancelled) setResult(orderResult);
       })
@@ -42,7 +42,7 @@ export function useManualPayment(locale: Locale, signed: boolean) {
     return () => {
       cancelled = true;
     };
-  }, [isOpen, locale, signed, method]);
+  }, [isOpen, productId, signed, method]);
 
   return { isOpen, toggle, method, setMethod, loading, result, error };
 }

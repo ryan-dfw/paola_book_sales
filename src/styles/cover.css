@@ -1,63 +1,99 @@
-.cover {
+/*
+ * Every cover — the real Stripe product image or the skeleton placeholder
+ * shown before it's ready — renders inside .cover-frame, which owns the
+ * size/rotation/shadow and adds a strip of "page edges" peeking out the
+ * right side. That's what keeps a dark-on-dark cover image from reading as
+ * a flat rectangle against this site's dark background: even without that
+ * visual trick, it also gives every cover (regardless of how Stripe's
+ * source image was cropped) the same fixed size and 2:3 aspect ratio, via
+ * .cover-skeleton/.cover-image below.
+ */
+.cover-frame {
+  position: relative;
   width: 100%;
   max-width: 340px;
   aspect-ratio: 2 / 3;
-  border-radius: 6px;
-  background:
-    radial-gradient(120% 90% at 15% 0%, rgba(255, 255, 255, 0.07), transparent 60%),
-    linear-gradient(160deg, #232323 0%, #0e0e0e 55%, #000000 100%);
+  border-radius: 2px 6px 6px 2px;
+  transform: rotate(-1.5deg);
+  /* The drop shadow/glow lives here — on the one static frame — rather than
+     on the crossfading image layers below. A blurred box-shadow spills
+     outside its own element's box, so if each layer carried its own, the
+     old (always at full opacity) and incoming (fading 0→1) layers' shadows
+     would overlap and compound out past the frame's edge, flashing darker
+     mid-transition. Keeping it here means that halo never moves. */
   box-shadow:
     0 30px 60px -20px rgba(0, 0, 0, 0.7),
-    0 0 50px rgba(224, 51, 63, 0.14);
-  transform: rotate(-1.5deg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 12% 10%;
-  color: #ffffff;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid #000000;
+    0 0 50px rgba(224, 51, 63, 0.14),
+    0 0 0 1px rgba(242, 239, 233, 0.12);
 }
 
-.cover::after {
+.cover-frame::after {
   content: '';
   position: absolute;
-  inset: 14px;
-  border: 1px solid rgba(224, 51, 63, 0.45);
-  pointer-events: none;
+  top: 5px;
+  bottom: 5px;
+  right: -5px;
+  width: 8px;
+  background: repeating-linear-gradient(to bottom, #ece7da 0px, #ece7da 1px, #d2ccbc 1px, #d2ccbc 2px);
+  border-radius: 0 3px 3px 0;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.45);
+  z-index: 0;
 }
 
-.cover-eyebrow {
-  font-size: 0.68rem;
-  letter-spacing: 0.28em;
-  color: var(--accent);
-  margin-bottom: 16px;
-  font-weight: 600;
+.cover-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
 }
 
-.cover-rule {
-  width: 46px;
-  height: 2px;
-  background: var(--accent);
-  margin-bottom: 18px;
+.cover-layer-incoming {
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 260ms ease;
 }
 
-.cover-title {
-  font-family: 'Bebas Neue', Impact, sans-serif;
-  font-weight: normal;
-  letter-spacing: 0.01em;
-  font-size: clamp(1.6rem, 4.4vw, 2.2rem);
-  line-height: 1.1;
-  color: #ffffff;
+.cover-layer-incoming.is-in {
+  opacity: 1;
 }
 
-.cover-author {
-  margin-top: 22px;
-  font-family: 'Fraunces', serif;
-  font-style: italic;
-  font-size: 0.95rem;
-  color: var(--accent);
+.cover-skeleton,
+.cover-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 2px 6px 6px 2px;
+}
+
+/* Shown in place of .cover-image while there's no real cover to display yet.
+   It's a plain child of the (already-tilted) .cover-frame, same as the real
+   art, so it picks up that same rotation automatically — no separate tilt
+   needed here. The shimmer is a lightened diagonal band sweeping across a
+   dark base, the standard "skeleton loader" look, matching this cover's
+   own dark palette rather than a generic light-grey placeholder. */
+.cover-skeleton {
+  background: linear-gradient(100deg, #1a1a1c 20%, #333338 42%, #4a4a51 50%, #333338 58%, #1a1a1c 80%);
+  background-size: 250% 100%;
+  animation: cover-skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes cover-skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -50% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cover-skeleton {
+    animation: none;
+    background-position: 50% 0;
+  }
+}
+
+.cover-image {
+  object-fit: cover;
+  object-position: center;
+  border: 1px solid rgba(0, 0, 0, 0.6);
 }

@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { CONTENT } from './content';
 import { formatMoney } from './utils/formatMoney';
 
-import { usePrices } from './hooks/usePrices';
+import { useProducts } from './hooks/useProducts';
 import { useProductSelection } from './hooks/useProductSelection';
 import { useBanner } from './hooks/useBanner';
 import { useReturnBanner } from './hooks/useReturnBanner';
@@ -13,7 +13,7 @@ import { useManualPayment } from './hooks/useManualPayment';
 import { Banner } from './components/Banner';
 import { Header } from './components/Header';
 import { BookCover } from './components/BookCover';
-import { LangToggle } from './components/LangToggle';
+import { EditionToggle } from './components/EditionToggle';
 import { SignedToggle } from './components/SignedToggle';
 import { PriceDisplay } from './components/PriceDisplay';
 import { BuyButton } from './components/BuyButton';
@@ -22,27 +22,36 @@ import { ManualPaymentPanel } from './components/ManualPaymentPanel';
 import { Footer } from './components/Footer';
 
 export function App() {
-  const { locale, setLocale, signed, setSigned } = useProductSelection();
-  const prices = usePrices();
+  const products = useProducts();
+  const { edition, setEdition, signed, setSigned } = useProductSelection();
   const { banner, showBanner } = useBanner();
   useReturnBanner(showBanner);
   const { startCheckout, isRedirecting } = useCheckout(showBanner);
-  const manual = useManualPayment(locale, signed);
 
-  const content = CONTENT[locale];
-  const priceEntry = prices?.[locale] ?? null;
+  const lang = edition === 'espanol' ? 'es' : 'en';
+  const content = CONTENT[lang];
+
+  // Map the three-way edition choice straight onto a Stripe product via its
+  // lang/format metadata — 'hardcover'/'english' pick a format within
+  // English, 'espanol' just needs the Spanish product (only one format
+  // exists there). Falls back to matching on lang alone if a product isn't
+  // tagged with a format yet, so a still-being-set-up product doesn't just
+  // disappear from the page.
+  const targetFormat = edition === 'hardcover' ? 'hardcover' : edition === 'english' ? 'softcover' : null;
+  const product =
+    products?.find((p) => p.lang === lang && (targetFormat ? p.format === targetFormat : true)) ??
+    products?.find((p) => p.lang === lang) ??
+    null;
+
+  const manual = useManualPayment(product?.id ?? null, signed);
 
   useEffect(() => {
     document.title = `${content.title} — a memoir`;
   }, [content.title]);
 
-  const priceFormatted = priceEntry ? formatMoney(priceEntry.amount, priceEntry.currency) : '…';
-  const buyLabel = isRedirecting
-    ? 'One moment…'
-    : priceEntry
-      ? `${content.buyPrefix} — ${priceFormatted}`
-      : content.buyPrefix;
-  const buyDisabled = !priceEntry || isRedirecting;
+  const priceFormatted = product ? formatMoney(product.amount, product.currency) : '…';
+  const buyLabel = isRedirecting ? 'One moment…' : content.buyPrefix;
+  const buyDisabled = !product || isRedirecting;
 
   const manualMessage = manual.result
     ? content.resultTemplate(
@@ -59,19 +68,23 @@ export function App() {
       <Header />
 
       <main className="layout">
-        <BookCover />
+        <BookCover title={content.title} image={product?.image ?? null} />
 
         <section className="details">
           <h1>{content.title}</h1>
           <p className="byline">{content.byline}</p>
 
-          <LangToggle locale={locale} onChange={setLocale} />
+          <EditionToggle edition={edition} onChange={setEdition} />
 
-          <p className="blurb">{content.blurb}</p>
+          <p className="blurb">{product?.description ?? ''}</p>
 
           <SignedToggle label={content.signedLabel} checked={signed} onChange={setSigned} />
           <PriceDisplay formatted={priceFormatted} />
-          <BuyButton label={buyLabel} disabled={buyDisabled} onClick={() => startCheckout(locale, signed)} />
+          <BuyButton
+            label={buyLabel}
+            disabled={buyDisabled}
+            onClick={() => product && startCheckout(product.id, signed)}
+          />
 
           <div className="alt-payment">
             <AltPaymentToggle

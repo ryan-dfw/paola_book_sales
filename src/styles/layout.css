@@ -44,4 +44,27 @@
   color: var(--ink-soft);
   font-size: 0.78rem;
   border-top: 1px solid var(--line);
+  /* Sit side by side on one row whenever there's room; only drop to two
+     rows once they no longer both fit. */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 4px 16px;
+}
+
+.footer-trust,
+.footer-copyright {
+  margin: 0;
+}
+
+.footer-trust {
+  /* Short enough to always fit on its own line at any screen width, so it
+     never needs to wrap internally — only the copyright line below is long
+     enough that a very narrow phone might still have to. */
+  white-space: nowrap;
+}
+
+.footer-copyright {
+  opacity: 0.7;
 }

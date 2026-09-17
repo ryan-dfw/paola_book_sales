@@ -1,14 +1,17 @@
 import { useState } from 'react';
-import type { Locale } from '../types';
+import type { Edition } from '../content/types';
 
 /**
- * Language and "signed copy" are deliberately independent bits of state with
- * separate setters, so switching English/Español never resets the signed-copy
- * choice.
+ * The two independent choices a buyer makes: edition (one of the three real
+ * products — English Hardcover, English Softcover, or Spanish — picked
+ * directly via the three-way selector rather than separate language/format
+ * toggles) and whether they want it signed. App.tsx resolves `edition` to an
+ * actual Stripe product by matching each product's lang/format metadata —
+ * this hook only tracks the buyer's choice, not which product it maps to.
  */
-export function useProductSelection(initialLocale: Locale = 'en') {
-  const [locale, setLocale] = useState<Locale>(initialLocale);
+export function useProductSelection() {
+  const [edition, setEdition] = useState<Edition>('english');
   const [signed, setSigned] = useState(false);
 
-  return { locale, setLocale, signed, setSigned };
+  return { edition, setEdition, signed, setSigned };
 }
