@@ -2,22 +2,25 @@
 //
 // For customers who'd rather pay by Venmo or Zelle — neither has a
 // processor API a website can hook into, so this isn't a real payment,
-// it's just a lookup: it returns the author's handle for the chosen method
-// plus a short reference code. No name, email, or address is collected —
-// this is built for in-person sales at an event, where the buyer and the
-// author are standing next to each other, so asking for personal details
-// just to see a Venmo handle would be unnecessary friction (and honestly a
-// little alarming). Shipping/fulfillment for remote orders is an
-// after-the-event problem, not handled here yet.
+// it's just a lookup: it returns the author's handle for the chosen method,
+// a short reference code, and the total to send (bumped by the flat
+// shipping fee when the buyer wants it shipped). No name, email, or
+// address is collected through a form — this path still has no structured
+// field for any of that. Instead, when "signed" or "ship" is checked, the
+// quoted instructions (see src/content/en.ts / es.ts's resultTemplate) ask
+// the buyer to leave a note in the Venmo/Zelle app itself — the author has
+// to actually go read that note in the payment app to get the inscription
+// name or shipping address; nothing here captures or surfaces it.
 //
-// TODO before going live for remote sales: email/log this the same way
-// stripe-webhook.js does for paid ones, and reintroduce buyer contact
-// details at that point — they'll actually be needed once orders ship.
+// TODO before going live for remote (shipped) sales: email/log this the
+// same way stripe-webhook.js does for paid ones, so a "ship" order doesn't
+// get missed. Consider adding a real address field at that point too,
+// rather than relying on the buyer to remember to leave a note.
 
-const { stripeClient, listActiveProducts } = require('./_shared');
+const { stripeClient, listActiveProducts, SHIPPING_FEE_CENTS } = require('./_shared');
 
-// Placeholder handles — replace with the author's real Venmo/Zelle details
-// before this goes live. Configurable via env so they're not baked into code.
+// Real handles, shown to customers verbatim — set via env (see .env /
+// Netlify site settings) rather than hardcoded here.
 const PAYMENT_HANDLES = {
   venmo: process.env.VENMO_HANDLE || '@replace-with-real-venmo-handle',
   zelle: process.env.ZELLE_CONTACT || 'replace-with-real-zelle-email-or-phone',
@@ -55,8 +58,9 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON body' }) };
   }
 
-  const { productId, signed: signedRaw, method } = body;
+  const { productId, signed: signedRaw, ship: shipRaw, method } = body;
   const signed = Boolean(signedRaw);
+  const ship = Boolean(shipRaw);
 
   if (!['venmo', 'zelle'].includes(method)) {
     return {
@@ -86,6 +90,11 @@ exports.handler = async (event) => {
   }
 
   const referenceCode = generateReferenceCode();
+  // Same flat fee Stripe Checkout adds for "ship it to me" — see
+  // SHIPPING_FEE_CENTS's own comment in _shared.js. There's no Stripe
+  // shipping line on this path (it's not a Stripe payment at all), so we
+  // just add it to the quoted total ourselves.
+  const amount = product.amount + (ship ? SHIPPING_FEE_CENTS : 0);
 
   console.log('Manual (Venmo/Zelle) payment instructions issued:', {
     referenceCode,
@@ -93,16 +102,20 @@ exports.handler = async (event) => {
     productId: product.id,
     productName: product.name,
     signed,
-    amountCents: product.amount,
+    ship,
+    amountCents: amount,
     currency: product.currency,
     createdAt: new Date().toISOString(),
+    // Reminder for whoever reads this log: "signed"/"ship" here just mean
+    // the buyer was *told* to leave a note about it in the Venmo/Zelle app.
+    // Nothing here confirms they actually did, or captures what it said.
   });
 
   return {
     statusCode: 200,
     body: JSON.stringify({
       referenceCode,
-      amount: product.amount,
+      amount,
       currency: product.currency,
       method,
       handle: PAYMENT_HANDLES[method],

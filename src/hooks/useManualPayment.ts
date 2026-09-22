@@ -3,13 +3,14 @@ import type { ManualOrderResult, ManualPaymentMethod } from '../types';
 import { submitManualOrder } from '../api/manualOrder';
 
 /**
- * In-person payment helper: no name/address collection. The buyer and the
- * author are standing next to each other, so this just needs to surface
- * which handle to pay and a short reference code — nothing else.
- * Automatically re-fetches whenever the panel is open and the method,
- * product, or signed-copy choice changes.
+ * In-person (or note-based remote) payment helper: still no structured
+ * name/address field. Signed and shipping requests both ride along as a
+ * note the buyer is asked to leave in the Venmo/Zelle app itself — this
+ * hook just needs to surface which handle to pay, the (fee-adjusted) total,
+ * and a short reference code. Automatically re-fetches whenever the panel
+ * is open and the method, product, signed-copy, or shipping choice changes.
  */
-export function useManualPayment(productId: string | null, signed: boolean) {
+export function useManualPayment(productId: string | null, signed: boolean, ship: boolean) {
   const [isOpen, setIsOpen] = useState(false);
   const [method, setMethod] = useState<ManualPaymentMethod>('venmo');
   const [loading, setLoading] = useState(false);
@@ -25,7 +26,7 @@ export function useManualPayment(productId: string | null, signed: boolean) {
     setLoading(true);
     setError(null);
 
-    submitManualOrder({ productId, signed, method })
+    submitManualOrder({ productId, signed, ship, method })
       .then((orderResult) => {
         if (!cancelled) setResult(orderResult);
       })
@@ -42,7 +43,7 @@ export function useManualPayment(productId: string | null, signed: boolean) {
     return () => {
       cancelled = true;
     };
-  }, [isOpen, productId, signed, method]);
+  }, [isOpen, productId, signed, ship, method]);
 
   return { isOpen, toggle, method, setMethod, loading, result, error };
 }

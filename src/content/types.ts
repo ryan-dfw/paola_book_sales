@@ -38,5 +38,19 @@ export interface LocaleContent {
   altToggleClose: string;
   manualIntro: string;
   manualMethodLabels: ManualMethodLabels;
-  resultTemplate: (amount: string, method: ManualPaymentMethod, handle: string, code: string) => string;
+  /**
+   * Builds the Venmo/Zelle instructions shown after picking a method.
+   * `signed`/`ship` reflect the buyer's checkbox choices — since this path
+   * has no structured fields for either, both get folded into the message
+   * as a request to leave a note in the Venmo/Zelle app itself (`amount`
+   * already has the shipping fee added when `ship` is true).
+   */
+  resultTemplate: (
+    amount: string,
+    method: ManualPaymentMethod,
+    handle: string,
+    code: string,
+    signed: boolean,
+    ship: boolean
+  ) => string;
 }

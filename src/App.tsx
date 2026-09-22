@@ -23,9 +23,9 @@ import { AltPaymentToggle } from './components/AltPaymentToggle';
 import { ManualPaymentPanel } from './components/ManualPaymentPanel';
 import { Footer } from './components/Footer';
 
-// TEMP: hides the "Prefer Venmo or Zelle?" manual-payment option site-wide.
-// Flip to true to bring it straight back — nothing else needs to change.
-const SHOW_ALT_PAYMENT = false;
+// Set to false to hide the "Prefer Venmo or Zelle?" manual-payment option
+// site-wide again — nothing else needs to change.
+const SHOW_ALT_PAYMENT = true;
 
 export function App() {
   const products = useProducts();
@@ -49,7 +49,7 @@ export function App() {
     products?.find((p) => p.lang === lang) ??
     null;
 
-  const manual = useManualPayment(product?.id ?? null, signed);
+  const manual = useManualPayment(product?.id ?? null, signed, shipToMe);
 
   useEffect(() => {
     document.title = `${content.title} — a memoir`;
@@ -70,7 +70,9 @@ export function App() {
         formatMoney(manual.result.amount, manual.result.currency),
         manual.result.method,
         manual.result.handle,
-        manual.result.referenceCode
+        manual.result.referenceCode,
+        signed,
+        shipToMe
       )
     : manual.error;
 

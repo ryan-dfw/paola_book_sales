@@ -11,6 +11,11 @@ export const es: LocaleContent = {
   altToggleClose: 'No, gracias',
   manualIntro: '¿Prefieres pagar con Venmo o Zelle? Elige uno:',
   manualMethodLabels: { venmo: 'Venmo', zelle: 'Zelle' },
-  resultTemplate: (amount, method, handle, code) =>
-    `Envía ${amount} por ${method === 'venmo' ? 'Venmo' : 'Zelle'} a ${handle} — menciona el código ${code} para identificarlo fácilmente.`,
+  resultTemplate: (amount, method, handle, code, signed, ship) => {
+    const methodName = method === 'venmo' ? 'Venmo' : 'Zelle';
+    let message = `Envía ${amount} por ${methodName} a ${handle} — menciona el código ${code} para saber cuál enviarte.`;
+    if (signed) message += ' Deja una nota pidiendo que te lo firmen.';
+    if (ship) message += '\nComo te lo vamos a enviar, deja una nota con tu dirección postal.';
+    return message;
+  },
 };

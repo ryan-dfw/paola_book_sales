@@ -100,4 +100,8 @@
   font-size: 1.02rem;
   line-height: 1.5;
   color: var(--ink);
+  /* resultTemplate() inserts a real \n before the shipping-address sentence
+     for readability — pre-line respects that while still wrapping normally
+     everywhere else. */
+  white-space: pre-line;
 }

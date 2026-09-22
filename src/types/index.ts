@@ -29,10 +29,12 @@ export interface Product {
 export interface ManualOrderPayload {
   productId: string;
   signed: boolean;
+  /** Buyer wants it shipped — adds the flat fee to the quoted amount. See ManualOrderResult's doc comment for what this doesn't do. */
+  ship: boolean;
   method: ManualPaymentMethod;
 }
 
-/** What /api/manual-order returns on success. No name/email/address — this is an in-person handoff, not a shipped order. */
+/** What /api/manual-order returns on success. `amount` already includes the shipping fee when `ship` was requested — still no structured name/email/address field, though; that's only ever conveyed via a note the buyer leaves in the Venmo/Zelle app. */
 export interface ManualOrderResult {
   referenceCode: string;
   amount: number;

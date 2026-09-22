@@ -17,7 +17,7 @@
 // so enabling PayPal and Cash App Pay there is the entire integration;
 // no code change needed here to add them.
 
-const { stripeClient, listActiveProducts } = require('./_shared');
+const { stripeClient, listActiveProducts, SHIPPING_FEE_CENTS } = require('./_shared');
 
 // Stripe Checkout's own UI (buttons, labels, form chrome) is translated
 // automatically based on this. It does NOT translate strings we supply
@@ -33,10 +33,9 @@ const INSCRIPTION_LABELS = {
   es: 'Nombre para la dedicatoria (opcional)',
 };
 
-// Flat rate, all editions, US only. Also duplicated client-side as
-// SHIPPING_FEE_CENTS in src/constants.ts (used to show the fee in the
-// on-page price before checkout) — keep both in sync if this ever changes.
-const SHIPPING_FEE_CENTS = 600;
+// SHIPPING_FEE_CENTS now lives in _shared.js (manual-order.js needs it too).
+// Country restriction is specific to Stripe's own address collection, so it
+// stays here.
 const SHIPPING_ALLOWED_COUNTRIES = ['US'];
 
 // Same localization caveat as INSCRIPTION_LABELS above — Stripe Checkout's
