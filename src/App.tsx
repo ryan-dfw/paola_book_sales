@@ -21,6 +21,10 @@ import { AltPaymentToggle } from './components/AltPaymentToggle';
 import { ManualPaymentPanel } from './components/ManualPaymentPanel';
 import { Footer } from './components/Footer';
 
+// TEMP: hides the "Prefer Venmo or Zelle?" manual-payment option site-wide.
+// Flip to true to bring it straight back — nothing else needs to change.
+const SHOW_ALT_PAYMENT = false;
+
 export function App() {
   const products = useProducts();
   const { edition, setEdition, signed, setSigned } = useProductSelection();
@@ -91,28 +95,26 @@ export function App() {
             disabled={buyDisabled}
             onClick={() => product && startCheckout(product.id, signed)}
           />
-          {/* TEMP DEBUG LABEL — delete this <p> and the ".debug-label" rule
-              in src/styles/product.css to remove. Plain text, not a design
-              element — doesn't touch the button or block clicks. */}
-          <p className="debug-label" aria-hidden="true">DEBUG: CHECKOUT NOT TESTED — DO NOT USE</p>
 
-          <div className="alt-payment">
-            <AltPaymentToggle
-              label={manual.isOpen ? content.altToggleClose : content.altToggle}
-              onClick={manual.toggle}
-            />
-
-            {manual.isOpen && (
-              <ManualPaymentPanel
-                intro={content.manualIntro}
-                methodLabels={content.manualMethodLabels}
-                method={manual.method}
-                onMethodChange={manual.setMethod}
-                loading={manual.loading}
-                message={manualMessage}
+          {SHOW_ALT_PAYMENT && (
+            <div className="alt-payment">
+              <AltPaymentToggle
+                label={manual.isOpen ? content.altToggleClose : content.altToggle}
+                onClick={manual.toggle}
               />
-            )}
-          </div>
+
+              {manual.isOpen && (
+                <ManualPaymentPanel
+                  intro={content.manualIntro}
+                  methodLabels={content.manualMethodLabels}
+                  method={manual.method}
+                  onMethodChange={manual.setMethod}
+                  loading={manual.loading}
+                  message={manualMessage}
+                />
+              )}
+            </div>
+          )}
         </section>
       </main>
 

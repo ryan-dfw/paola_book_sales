@@ -5,6 +5,11 @@
   --cream-deep: #1c1c1f;
   --accent: #e0333f;
   --accent-deep: #b3121c;
+  /* Same red family as --accent, lightened until it clears 4.5:1 contrast
+     against --cream at any text size (--accent itself only measures ~4.3:1,
+     just under the WCAG AA threshold for normal-weight body text) — used
+     where older readers need to make out small text/links reliably. */
+  --accent-bright: #e85560;
   --line: #2b2b2e;
   color-scheme: dark;
 }

@@ -3,64 +3,101 @@
   padding-top: 22px;
 }
 
+/* Sized for an audience that skews well past typical "web app" users —
+   anywhere from their 20s to their 70s+ — so this whole manual-payment
+   flow (the toggle plus everything it opens) favors bigger text and
+   bigger tap targets over compactness. */
 .alt-payment-toggle {
   background: none;
   border: none;
-  padding: 0;
-  color: var(--accent);
+  /* ~44px minimum tap target (WCAG 2.5.5 / iOS & Android guidance), not
+     just a same-size-as-the-text hitbox. */
+  min-height: 44px;
+  padding: 10px 2px;
+  display: inline-flex;
+  align-items: center;
+  /* --accent alone is ~4.3:1 on this background — just under the 4.5:1
+     AA minimum for normal-weight text at this size. --accent-bright is
+     the same red, lightened until it clears that bar. */
+  color: var(--accent-bright);
   font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 1.15rem;
+  font-weight: 600;
   cursor: pointer;
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-underline-offset: 4px;
 }
 
 .alt-payment-toggle:hover {
-  color: var(--accent-deep);
+  color: var(--ink);
+}
+
+.alt-payment-toggle:focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 3px;
+  border-radius: 3px;
 }
 
 .manual-panel {
   margin-top: 18px;
-  padding: 20px;
+  padding: 24px;
   background: var(--cream-deep);
   border: 1px solid var(--line);
   border-radius: 10px;
-  max-width: 420px;
+  max-width: 460px;
 }
 
 .manual-panel-intro {
-  margin: 0 0 16px;
-  font-size: 0.88rem;
+  margin: 0 0 18px;
+  font-size: 1.05rem;
+  line-height: 1.5;
   color: var(--ink-soft);
 }
 
 .mf-methods {
   display: flex;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: 12px 32px;
 }
 
 .mf-radio {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.9rem;
+  gap: 10px;
+  /* Padding + min-height turns the already-clickable <label> into a proper
+     44px tap target, not just a thin line of text next to a tiny dot. */
+  padding: 8px 4px;
+  margin: -8px -4px;
+  min-height: 44px;
+  font-size: 1.1rem;
   color: var(--ink);
   cursor: pointer;
   user-select: none;
 }
 
 .mf-radio input[type='radio'] {
-  accent-color: var(--accent);
+  /* Bumped up from the ~13px browser default — small radio dots are one
+     of the harder-to-hit, harder-to-see controls on a page for anyone
+     with reduced fine motor control or vision. */
+  width: 22px;
+  height: 22px;
+  accent-color: var(--accent-bright);
   cursor: pointer;
+  flex-shrink: 0;
+}
+
+.mf-radio input[type='radio']:focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 2px;
 }
 
 .manual-result {
-  margin: 16px 0 0;
-  padding: 12px 14px;
+  margin: 18px 0 0;
+  padding: 14px 16px;
   background: rgba(224, 51, 63, 0.12);
   border: 1px solid rgba(224, 51, 63, 0.35);
   border-radius: 8px;
-  font-size: 0.88rem;
+  font-size: 1.02rem;
+  line-height: 1.5;
   color: var(--ink);
 }
