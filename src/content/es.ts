@@ -4,6 +4,8 @@ export const es: LocaleContent = {
   title: 'El Narcisista Amor de Mi Vida',
   byline: 'por Paola Roman',
   signedLabel: 'Firmar mi copia',
+  shipLabel: '$6 de envío (en EE. UU. continental)',
+  shippingNote: 'incluye $6 de envío',
   buyPrefix: 'Pagar',
   altToggle: '¿Prefieres Venmo o Zelle?',
   altToggleClose: 'No, gracias',

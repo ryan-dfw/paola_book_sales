@@ -36,6 +36,8 @@ exports.handler = async (event) => {
       (f) => f.key === 'inscription_name'
     );
 
+    const ship = session.metadata?.ship === 'yes';
+
     const order = {
       sessionId: session.id,
       email: session.customer_details?.email,
@@ -44,6 +46,11 @@ exports.handler = async (event) => {
       productId: session.metadata?.productId,
       signed: session.metadata?.signed === 'yes',
       inscriptionName: inscriptionField?.text?.value || null,
+      // Only present when the buyer checked "ship it to me" — see
+      // create-checkout-session.js. Both are null for in-person pickup.
+      ship,
+      shippingName: ship ? session.shipping_details?.name || null : null,
+      shippingAddress: ship ? session.shipping_details?.address || null : null,
     };
 
     console.log('New paid order:', order);
@@ -51,15 +58,16 @@ exports.handler = async (event) => {
     // TODO before going live: replace this console.log with something real —
     // e.g. email the author (Resend/SendGrid), write to Airtable/a database,
     // or post to Slack. This is the one place order fulfillment starts — and
-    // where you'd flag "signed" orders for the author to actually sign.
+    // where you'd flag "signed" orders for the author to actually sign, and
+    // now also "ship" orders for the author to actually mail (using
+    // order.shippingName / order.shippingAddress).
     // `order.productId` is the Stripe Product id — look it up (or expand it
     // on the session) if you need the product name/format in the message.
     //
-    // Shipping is intentionally not collected yet (this build is for
-    // in-person handoff at an event). Once remote/shipped orders are
-    // supported, add `shipping_address_collection` + `shipping_options` back
-    // to create-checkout-session.js and read `session.shipping_details` /
-    // `session.customer_details.address` here.
+    // The Venmo/Zelle manual-payment path (manual-order.js) is a separate
+    // flow and still doesn't collect shipping info at all — it's currently
+    // hidden from the site (see SHOW_ALT_PAYMENT in src/App.tsx), but if
+    // it's ever turned back on, it'll need this same treatment.
   }
 
   return { statusCode: 200, body: JSON.stringify({ received: true }) };

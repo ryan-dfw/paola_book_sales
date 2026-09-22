@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { CONTENT } from './content';
+import { SHIPPING_FEE_CENTS } from './constants';
 import { formatMoney } from './utils/formatMoney';
 
 import { useProducts } from './hooks/useProducts';
@@ -15,6 +16,7 @@ import { Header } from './components/Header';
 import { BookCover } from './components/BookCover';
 import { EditionToggle } from './components/EditionToggle';
 import { SignedToggle } from './components/SignedToggle';
+import { ShipToggle } from './components/ShipToggle';
 import { PriceDisplay } from './components/PriceDisplay';
 import { BuyButton } from './components/BuyButton';
 import { AltPaymentToggle } from './components/AltPaymentToggle';
@@ -27,7 +29,7 @@ const SHOW_ALT_PAYMENT = false;
 
 export function App() {
   const products = useProducts();
-  const { edition, setEdition, signed, setSigned } = useProductSelection();
+  const { edition, setEdition, signed, setSigned, shipToMe, setShipToMe } = useProductSelection();
   const { banner, showBanner } = useBanner();
   useReturnBanner(showBanner);
   const { startCheckout, isRedirecting } = useCheckout(showBanner);
@@ -53,7 +55,13 @@ export function App() {
     document.title = `${content.title} — a memoir`;
   }, [content.title]);
 
-  const priceFormatted = product ? formatMoney(product.amount, product.currency) : '…';
+  // Reflects the $6 add-on in the displayed total the moment the buyer
+  // checks the box, ahead of the same fee being added at Stripe Checkout —
+  // see SHIPPING_FEE_CENTS's own comment for why these two numbers must
+  // stay in sync by hand.
+  const priceFormatted = product
+    ? formatMoney(product.amount + (shipToMe ? SHIPPING_FEE_CENTS : 0), product.currency)
+    : '…';
   const buyLabel = isRedirecting ? 'One moment…' : content.buyPrefix;
   const buyDisabled = !product || isRedirecting;
 
@@ -89,11 +97,12 @@ export function App() {
           <p className="blurb">{product?.description ?? ''}</p>
 
           <SignedToggle label={content.signedLabel} checked={signed} onChange={setSigned} />
-          <PriceDisplay formatted={priceFormatted} />
+          <ShipToggle label={content.shipLabel} checked={shipToMe} onChange={setShipToMe} />
+          <PriceDisplay formatted={priceFormatted} note={shipToMe ? content.shippingNote : undefined} />
           <BuyButton
             label={buyLabel}
             disabled={buyDisabled}
-            onClick={() => product && startCheckout(product.id, signed)}
+            onClick={() => product && startCheckout(product.id, signed, shipToMe)}
           />
 
           {SHOW_ALT_PAYMENT && (

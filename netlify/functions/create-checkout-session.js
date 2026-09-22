@@ -5,8 +5,10 @@
 // PayPal / Cash App Pay, once enabled) details are entered on Stripe's
 // page, never on ours.
 //
-// No shipping is collected here — this build is for in-person handoff at
-// an event; shipping/fulfillment gets built out after that.
+// This build is primarily for in-person handoff at an event, so shipping
+// stays opt-in: the buyer checks a box on our page for +$6 and we turn on
+// Stripe's own address collection for that one session; otherwise no
+// address is asked for at all, same as before.
 //
 // Note on extra payment methods: this deliberately does NOT set
 // `payment_method_types`. Leaving it unset puts Stripe in "automatic
@@ -31,6 +33,20 @@ const INSCRIPTION_LABELS = {
   es: 'Nombre para la dedicatoria (opcional)',
 };
 
+// Flat rate, all editions, US only. Also duplicated client-side as
+// SHIPPING_FEE_CENTS in src/constants.ts (used to show the fee in the
+// on-page price before checkout) — keep both in sync if this ever changes.
+const SHIPPING_FEE_CENTS = 600;
+const SHIPPING_ALLOWED_COUNTRIES = ['US'];
+
+// Same localization caveat as INSCRIPTION_LABELS above — Stripe Checkout's
+// own chrome is auto-translated by `locale`, but a shipping rate's display
+// name is our own string and isn't.
+const SHIPPING_RATE_LABELS = {
+  en: 'Shipping (USPS Media Mail)',
+  es: 'Envío (USPS Media Mail)',
+};
+
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
@@ -47,9 +63,11 @@ exports.handler = async (event) => {
 
   let productId;
   let signed;
+  let ship;
   try {
-    ({ productId, signed } = JSON.parse(event.body || '{}'));
+    ({ productId, signed, ship } = JSON.parse(event.body || '{}'));
     signed = Boolean(signed);
+    ship = Boolean(ship);
   } catch {
     return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON body' }) };
   }
@@ -100,7 +118,24 @@ exports.handler = async (event) => {
             ],
           }
         : {}),
-      metadata: { productId: product.id, signed: signed ? 'yes' : 'no' },
+      // Only when the buyer checks "ship it to me" do we ask Stripe to
+      // collect an address at all — otherwise Checkout stays exactly like
+      // the in-person-pickup flow it always was, no address field shown.
+      ...(ship
+        ? {
+            shipping_address_collection: { allowed_countries: SHIPPING_ALLOWED_COUNTRIES },
+            shipping_options: [
+              {
+                shipping_rate_data: {
+                  type: 'fixed_amount',
+                  fixed_amount: { amount: SHIPPING_FEE_CENTS, currency: 'usd' },
+                  display_name: SHIPPING_RATE_LABELS[product.lang] || SHIPPING_RATE_LABELS.en,
+                },
+              },
+            ],
+          }
+        : {}),
+      metadata: { productId: product.id, signed: signed ? 'yes' : 'no', ship: ship ? 'yes' : 'no' },
       success_url: `${siteUrl}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/?canceled=true`,
     });

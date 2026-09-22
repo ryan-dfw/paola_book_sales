@@ -29,6 +29,10 @@ export interface LocaleContent {
   title: string;
   byline: string;
   signedLabel: string;
+  /** Keep the dollar amount here in sync with SHIPPING_FEE_CENTS in netlify/functions/create-checkout-session.js. */
+  shipLabel: string;
+  /** Small note shown next to the price once shipping is added to it, so the jump in total isn't a surprise. */
+  shippingNote: string;
   buyPrefix: string;
   altToggle: string;
   altToggleClose: string;

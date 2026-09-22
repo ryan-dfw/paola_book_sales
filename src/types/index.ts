@@ -44,6 +44,8 @@ export interface ManualOrderResult {
 export interface CheckoutRequest {
   productId: string;
   signed: boolean;
+  /** Buyer opted to have it shipped (+ flat fee) instead of picking it up at the event. */
+  ship: boolean;
 }
 
 /** What /api/create-checkout-session returns. */

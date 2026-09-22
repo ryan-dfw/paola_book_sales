@@ -6,11 +6,11 @@ export function useCheckout(showBanner: (kind: BannerKind, message: string) => v
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   const startCheckout = useCallback(
-    async (productId: string, signed: boolean) => {
+    async (productId: string, signed: boolean, ship: boolean) => {
       setIsRedirecting(true);
 
       try {
-        const { url } = await createCheckoutSession({ productId, signed });
+        const { url } = await createCheckoutSession({ productId, signed, ship });
         window.location.href = url as string;
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Something went wrong starting checkout.';

@@ -113,6 +113,11 @@ h1 {
   color: var(--ink);
 }
 
+.price-note {
+  font-size: 0.95rem;
+  color: var(--accent-bright);
+}
+
 .buy-button {
   display: inline-flex;
   align-items: center;
